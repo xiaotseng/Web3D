@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title></title>
+    <style>canvas { width: 100%; height: 100% }</style>
+    <script src="js/three.js"></script>
+    <style type="text/css">
+    #canvas-frame{
+
+        position: absolute;
+        border: none;
+        cursor: pointer;
+        width: 100%;
+        height: 100%;
+        background-color: black;
+    }
+    </style>
+    <script>
+       var scene,renderer,camera;
+       function init() {
+           scene=new THREE.Scene();
+           renderer=new THREE.WebGLRenderer();
+           renderer.setSize(window.innerWidth,window.innerHeight);
+           camera=new THREE.PerspectiveCamera(90,window.innerWidth/window.innerHeight,0.1,1000);
+           scene.add(camera);
+           camera.position.z=100;
+           camera.position.y=-50;
+           camera.lookAt(new THREE.Vector3(0,0,0));
+           document.getElementById("canvas-frame").appendChild(renderer.domElement);
+       }
+       function update() {
+
+       }
+       function rendering() {
+           renderer.render(scene,camera);
+       }
+       function gameLoop() {
+           update();
+           rendering();
+           requestAnimationFrame(gameLoop);
+       }
+       function drawLine() {
+           var line_lenght=10;
+           var origin=new THREE.Vector3(0,0,0);
+           var dir_x=new THREE.Vector3(1,0,0);
+           var dir_y=new THREE.Vector3(0,1,0);
+           var dir_z=new THREE.Vector3(0,0,1);
+           var dirArray=new Array(new THREE.Vector3(0,0,1),new THREE.Vector3(0,0,1),new THREE.Vector3(0,0,1));
+
+           var geometry_x=new THREE.Geometry();
+           var geometry_y=new THREE.Geometry();
+           var geometry_z=new THREE.Geometry();
+           geometry_x.vertices[0]=new THREE.Vector3(0,0,0);
+           geometry_x.vertices[1]=new THREE.Vector3(1,0,0).multiplyScalar(line_lenght);
+           var material=new THREE.LineBasicMaterial({color:0xfff000});
+           var line=new THREE.Line(geometry_x,material);
+           scene.add(line);
+
+       }
+
+    </script>
+</head>
+<body style="margin: 0px;">
+    <div id="canvas-frame">dfgfg</div>
+<script>
+    init();
+    drawLine();
+    gameLoop();
+</script>
+</body>
+</html>
