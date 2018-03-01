@@ -6,10 +6,10 @@
     <script src="js/three.js"></script>
     <style type="text/css">
     #canvas-frame{
-
         position: absolute;
         border: none;
         cursor: pointer;
+        color: aliceblue;
         width: 100%;
         height: 100%;
         background-color: black;
@@ -17,16 +17,23 @@
     </style>
     <script>
        var scene,renderer,camera;
+       var container;
        function init() {
+           container=document.getElementById("canvas-frame");
            scene=new THREE.Scene();
            renderer=new THREE.WebGLRenderer();
            renderer.setSize(window.innerWidth,window.innerHeight);
+           container.appendChild(renderer.domElement);
            camera=new THREE.PerspectiveCamera(90,window.innerWidth/window.innerHeight,0.1,1000);
            scene.add(camera);
            camera.position.z=100;
            camera.position.y=-50;
+           camera.position.x=-50;
            camera.lookAt(new THREE.Vector3(0,0,0));
-           document.getElementById("canvas-frame").appendChild(renderer.domElement);
+           window.addEventListener("resize",function () {
+               camera.aspect=window.innerWidth/window.innerHeight;
+           })
+
        }
        function update() {
 
@@ -39,32 +46,38 @@
            rendering();
            requestAnimationFrame(gameLoop);
        }
-       function drawLine() {
-           var line_lenght=10;
-           var origin=new THREE.Vector3(0,0,0);
-           var dir_x=new THREE.Vector3(1,0,0);
-           var dir_y=new THREE.Vector3(0,1,0);
-           var dir_z=new THREE.Vector3(0,0,1);
-           var dirArray=new Array(new THREE.Vector3(0,0,1),new THREE.Vector3(0,0,1),new THREE.Vector3(0,0,1));
+       worldMat=new THREE.Matrix4();
+       worldMat.elements=[
+           1,0,0,0,
+           0,1,0,0,
+           0,0,1,0,
+           0,0,0,1
+       ];
 
-           var geometry_x=new THREE.Geometry();
-           var geometry_y=new THREE.Geometry();
-           var geometry_z=new THREE.Geometry();
-           geometry_x.vertices[0]=new THREE.Vector3(0,0,0);
-           geometry_x.vertices[1]=new THREE.Vector3(1,0,0).multiplyScalar(line_lenght);
-           var material=new THREE.LineBasicMaterial({color:0xfff000});
-           var line=new THREE.Line(geometry_x,material);
-           scene.add(line);
+       function drawCoordinateLine() {
+           var lineLength=100;
+           var directions=[new THREE.Vector3(1,0,0),new THREE.Vector3(0,1,0),new THREE.Vector3(0,0,1),new THREE.Vector3(0,0,0)];
+           //var directions=worldMat.elements;
+           var colors=[0xff0000,0x00ff00,0x0000ff];
+           for(i=0;i<directions.length-1;i++){
+               var geometry=new THREE.Geometry();
+               console.log(directions[i]);
+               geometry.vertices[0]=directions[directions.length-1];
+               geometry.vertices[1]=directions[i].multiplyScalar(lineLength).add(directions[directions.length-1]);
+               var material=new THREE.LineBasicMaterial({color:colors[i]});
+               var line=new THREE.Line(geometry,material);
+               scene.add(line);
+           }
 
        }
 
     </script>
 </head>
 <body style="margin: 0px;">
-    <div id="canvas-frame">dfgfg</div>
+    <div id="canvas-frame"></div>
 <script>
     init();
-    drawLine();
+    drawCoordinateLine();
     gameLoop();
 </script>
 </body>
