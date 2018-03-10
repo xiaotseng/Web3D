@@ -40963,7 +40963,7 @@
 
 	/**
 	 *
-	 * Player for AnimationClips.
+	 * Player.html for AnimationClips.
 	 *
 	 *
 	 * @author Ben Houston / http://clara.io/
