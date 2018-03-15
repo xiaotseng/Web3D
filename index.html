@@ -1,84 +1,116 @@
 <!DOCTYPE html>
 <html>
+
 <head>
     <title></title>
-    <style>canvas { width: 100%; height: 100% }</style>
+    <style>
+        canvas {
+            width: 100%;
+            height: 100%
+        }
+    </style>
     <script src="js/three.js"></script>
+    <script src="js/TrackballControls.js"></script>
+    <script src="js/TransformControls.js"></script>
     <style type="text/css">
-    #canvas-frame{
-        position: absolute;
-        border: none;
-        cursor: pointer;
-        color: aliceblue;
-        width: 100%;
-        height: 100%;
-        background-color: black;
-    }
+        #canvas-frame {
+            position: absolute;
+            border: none;
+            cursor: pointer;
+            color: aliceblue;
+            width: 100%;
+            height: 100%;
+            background-color: black;
+        }
     </style>
     <script>
-       var scene,renderer,camera;
-       var container;
-       function init() {
-           container=document.getElementById("canvas-frame");
-           scene=new THREE.Scene();
-           renderer=new THREE.WebGLRenderer();
-           renderer.setSize(window.innerWidth,window.innerHeight);
-           container.appendChild(renderer.domElement);
-           camera=new THREE.PerspectiveCamera(90,window.innerWidth/window.innerHeight,0.1,1000);
-           scene.add(camera);
-           camera.position.z=100;
-           camera.position.y=-50;
-           camera.position.x=-50;
-           camera.lookAt(new THREE.Vector3(0,0,0));
-           window.addEventListener("resize",function () {
-               camera.aspect=window.innerWidth/window.innerHeight;
-           })
+        var scene, renderer, camera;
+        var container;
+        var controller;
+        var transformController;
+        var clock = new THREE.Clock();
+        function init() {
+            container = document.getElementById("canvas-frame");
+            scene = new THREE.Scene();
+            renderer = new THREE.WebGLRenderer();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+            container.appendChild(renderer.domElement);
+            camera = new THREE.PerspectiveCamera(90, window.innerWidth / window.innerHeight, 0.1, 1000000);
+            scene.add(camera);
+            camera.position.z = 100;
+            camera.position.y = -50;
+            camera.position.x = -50;
+            camera.lookAt(new THREE.Vector3(0, 0, 0));
+            controller = new THREE.TrackballControls(camera, container);
+            window.addEventListener("resize", function () {
+                camera.aspect = window.innerWidth / window.innerHeight;
+            });
+            var box = crateBox();
+            transformController=new THREE.TransformControls(camera,renderer.domElement);
+            transformController.attach(box);
+            scene.add(transformController);
 
-       }
-       function update() {
 
-       }
-       function rendering() {
-           renderer.render(scene,camera);
-       }
-       function gameLoop() {
-           update();
-           rendering();
-           requestAnimationFrame(gameLoop);
-       }
-       worldMat=new THREE.Matrix4();
-       worldMat.elements=[
-           1,0,0,0,
-           0,1,0,0,
-           0,0,1,0,
-           0,0,0,1
-       ];
 
-       function drawCoordinateLine() {
-           var lineLength=100;
-           var directions=[new THREE.Vector3(1,0,0),new THREE.Vector3(0,1,0),new THREE.Vector3(0,0,1),new THREE.Vector3(0,0,0)];
-           //var directions=worldMat.elements;
-           var colors=[0xff0000,0x00ff00,0x0000ff];
-           for(i=0;i<directions.length-1;i++){
-               var geometry=new THREE.Geometry();
-               console.log(directions[i]);
-               geometry.vertices[0]=directions[directions.length-1];
-               geometry.vertices[1]=directions[i].multiplyScalar(lineLength).add(directions[directions.length-1]);
-               var material=new THREE.LineBasicMaterial({color:colors[i]});
-               var line=new THREE.Line(geometry,material);
-               scene.add(line);
-           }
+        }
+        function update() {
+            var deltaTime=clock.getDelta();
+            controller.update(deltaTime);
+            transformController.update(deltaTime);
+        }
+        function rendering() {
+            renderer.render(scene, camera);
+        }
+        function gameLoop() {
+            update();
+            rendering();
+            requestAnimationFrame(gameLoop);
+        }
+        worldMat = new THREE.Matrix4();
+        worldMat.elements = [
+            1, 0, 0, 0,
+            0, 1, 0, 0,
+            0, 0, 1, 0,
+            0, 0, 0, 1
+        ];
 
-       }
+        function drawCoordinateLine() {
+            var lineLength = 100;
+            var directions = [new THREE.Vector3(1, 0, 0), new THREE.Vector3(0, 1, 0), new THREE.Vector3(0, 0, 1), new THREE.Vector3(0, 0, 0)];
+            //var directions=worldMat.elements;
+            var colors = [0xff0000, 0x00ff00, 0x0000ff];
+            for (i = 0; i < directions.length - 1; i++) {
+                var geometry = new THREE.Geometry();
+                console.log(directions[i]);
+                geometry.vertices[0] = directions[directions.length - 1];
+                geometry.vertices[1] = directions[i].multiplyScalar(lineLength).add(directions[directions.length - 1]);
+                var material = new THREE.LineBasicMaterial({ color: colors[i] });
+                var line = new THREE.Line(geometry, material);
+                scene.add(line);
+            }
+
+        }
+        function crateBox() {
+            var gem = new THREE.BoxGeometry(10, 10, 10);
+            var mat = new THREE.MeshLambertMaterial({ color: 0xffaabb });
+            var boxNode = new THREE.Mesh(gem, mat);
+            scene.add(boxNode);
+            boxNode.position.set(0, 0, 0);
+            return boxNode;
+
+        }
 
     </script>
 </head>
+
 <body style="margin: 0px;">
     <div id="canvas-frame"></div>
-<script>
-    init();
-    drawCoordinateLine();
-    gameLoop();
-</script>
+    <script>
+        init();
+        drawCoordinateLine();
+
+        gameLoop();
+    </script>
 </body>
+
 </html>

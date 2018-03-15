@@ -20,24 +20,16 @@ function init() {
     var textureLoader=new THREE.TextureLoader();
     crateTexture=textureLoader.load("texture/crate1_diffuse.png");
     crateBumpMap=textureLoader.load("texture/crate1_bump.png");
-    crateNormalMap=textureLoader.load("texture/crate1_");
+    crateNormalMap=textureLoader.load("texture/crate1_normal.png");
 
-    var defaultMap=new THREE.Texture();//确省纹理
+    var gltfLoader=new THREE.GLTFLoader();
+    gltfLoader.load("models/glTF/testScene.gltf",function (scene1) {
+        scene.add(scene1.scene);
 
-
-    var babylonLoder=new THREE.BabylonLoader();
-    babylonLoder.load("models/qwe.babylon",function (mesh) {
-        //console.log(mesh);
 
     });
-    var loader=new THREE.TextureLoader();
-    var boxtext1=defaultMap;
-    var boxmat=new THREE.MeshPhongMaterial({color:0xff4444, wireframe:false});
-    /*loader.load("https://www.baidu.com/img/bd_logo1.png",function (texture) {
-        boxtexture=texture;
 
-    });*/
-
+    var boxmat=new THREE.MeshPhongMaterial({color:0xff4444, wireframe:false});//红色BOX的材质
     //添加物体
     mesh=new THREE.Mesh(new THREE.BoxGeometry(1,1,1),boxmat);
     mesh.castShadow=true;
@@ -50,9 +42,9 @@ function init() {
     scene.add(new THREE.AxisHelper(10));
     //灯光
     scene.add(new THREE.AmbientLight(0xffffff,0.5));
-    PointLight1=new THREE.PointLight(0xffffff,1,20);
+    PointLight1=new THREE.PointLight(0xffffff,1,200);
     PointLight1.castShadow=true;
-    PointLight1.position.y=8;
+    PointLight1.position.y=100;
     PointLight1.lookAt(new THREE.Vector3(0,0,0));
     scene.add(PointLight1);
 
@@ -63,10 +55,10 @@ function init() {
     scene.add(crate);
      //相机
     camera=new THREE.PerspectiveCamera(90,1280/720,0.1,1000);
-    camera.position.set(0,1.8,-5);
-    //camera.lookAt(new THREE.Vector3(0,0,0));
+    camera.position.set(0,100,-50);
+    camera.lookAt(new THREE.Vector3(0,0,0));
     //重置PlayerController
-    camera.matrixWorld=playerController.matrix;
+    //camera.matrixWorld=playerController.matrix;
 
      //场景循环
     animate();
@@ -107,13 +99,36 @@ function animate() {
     }
     renderer.render(scene,camera);
 }
-Actor=function () {
-    this.name="1";
-    this.rootComponent=new THREE.Object3D();
-    this.beginPlay=function () {
-    };
-
+//控制器类型的定义
+Controller=function() {
+    this.roll=0.0;
+    this.pitch=0.0;
+    this.yaw=0.0;
 };
+
+Controller.prototype={
+    constructor:Controller,
+    addPitch:function (deltaValue) {
+        this.pitch+=deltaValue;
+    },
+    addYaw:function (deltaValue) {
+        this.yaw+=deltaValue;
+    },
+    addRoll:function (deltaValue) {
+        this.roll+=deltaValue;
+    },
+    type:"controller",
+    getRotMatrix:function () {//取得旋转矩阵
+        return new THREE.Matrix4().makeRotationX(this.roll).
+        premultiply(new THREE.Matrix4().makeRotationY(this.pitch)).
+        premultiply(new THREE.Matrix4().makeRotationZ(this.yaw));
+    }
+};
+var controller1=new Controller();
+console.log(controller1);
+
+
+
 function keyDown(event) {
     keyboard[event.keyCode]=true;
 }

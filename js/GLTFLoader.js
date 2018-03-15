@@ -208,7 +208,7 @@ THREE.GLTFLoader = ( function () {
 
 	/**
 	 * Lights Extension
-	 *
+	 *处理灯光参数
 	 * Specification: PENDING
 	 */
 	function GLTFLightsExtension( json ) {
@@ -1224,7 +1224,7 @@ THREE.GLTFLoader = ( function () {
 		// loader object cache
 		this.cache = new GLTFRegistry();
 
-		// BufferGeometry caching
+		// BufferGeometry caching 几何缓存
 		this.primitiveCache = [];
 
 		this.textureLoader = new THREE.TextureLoader( this.options.manager );
