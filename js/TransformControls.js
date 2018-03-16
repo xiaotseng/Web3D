@@ -95,12 +95,13 @@
 			this.add( this.pickers );
 			this.add( this.planes );
 
-			//// PLANES
+			//// PLANES 射线交互平面,用于求交点
 
-			var planeGeometry = new THREE.PlaneBufferGeometry( 50, 50, 2, 2 );
-			var planeMaterial = new THREE.MeshBasicMaterial( { visible: false, side: THREE.DoubleSide } );
+			var planeGeometry = new THREE.PlaneBufferGeometry( 50, 50, 2, 2 );//平面几何体
+			var planeMaterial = new THREE.MeshBasicMaterial( { visible: false, side: THREE.DoubleSide } );//设置平面不可见,且为双面材质
 
 			var planes = {
+				//创建4个平面
 				"XY":   new THREE.Mesh( planeGeometry, planeMaterial ),
 				"YZ":   new THREE.Mesh( planeGeometry, planeMaterial ),
 				"XZ":   new THREE.Mesh( planeGeometry, planeMaterial ),
@@ -109,13 +110,14 @@
 
 			this.activePlane = planes[ "XYZE" ];
 
+			//旋转得到其它两个平面
 			planes[ "YZ" ].rotation.set( 0, Math.PI / 2, 0 );
 			planes[ "XZ" ].rotation.set( - Math.PI / 2, 0, 0 );
 
 			for ( var i in planes ) {
 
 				planes[ i ].name = i;
-				this.planes.add( planes[ i ] );
+				this.planes.add( planes[ i ] );//将4个平面加入结点this.planes
 				this.planes[ i ] = planes[ i ];
 
 			}
@@ -306,7 +308,7 @@
 
 		};
 
-		this.setActivePlane = function ( axis, eye ) {
+		this.setActivePlane = function ( axis, eye ) {//根据轴向与视线来确实交互平面
 
 			var tempMatrix = new THREE.Matrix4();
 			eye.applyMatrix4( tempMatrix.getInverse( tempMatrix.extractRotation( this.planes[ "XY" ].matrixWorld ) ) );
