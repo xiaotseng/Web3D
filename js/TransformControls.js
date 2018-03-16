@@ -599,12 +599,13 @@
 
 		// TODO: Make non-uniform scale and rotate play nice in hierarchies
 		// TODO: ADD RXYZ contol
+		//用Object3D的构造来构造这个对象
+		THREE.Object3D.call( this );//call（）的意思是函数执行的对像，相当于继承
 
-		THREE.Object3D.call( this );
 
 		domElement = ( domElement !== undefined ) ? domElement : document;
 
-		this.object = undefined;
+		this.object = undefined;//被操控对像
 		this.visible = false;
 		this.translationSnap = null;
 		this.rotationSnap = null;
@@ -614,16 +615,16 @@
 
 		var scope = this;
 
-		var _mode = "translate";
+		var _mode = "translate";//当前变换的状态
 		var _dragging = false;
-		var _gizmo = {
+		var _gizmo = {//创建三个Gizmo
 
 			"translate": new THREE.TransformGizmoTranslate(),
 			"rotate": new THREE.TransformGizmoRotate(),
 			"scale": new THREE.TransformGizmoScale()
 		};
 
-		for ( var type in _gizmo ) {
+		for ( var type in _gizmo ) {//逐个设置可见性，并添加
 
 			var gizmoObj = _gizmo[ type ];
 
@@ -637,8 +638,8 @@
 		var mouseUpEvent = { type: "mouseUp", mode: _mode };
 		var objectChangeEvent = { type: "objectChange" };
 
-		var ray = new THREE.Raycaster();
-		var pointerVector = new THREE.Vector2();
+		var ray = new THREE.Raycaster();//射线
+		var pointerVector = new THREE.Vector2();//鼠标点位
 
 		var point = new THREE.Vector3();
 		var offset = new THREE.Vector3();
@@ -653,7 +654,7 @@
 		var tempMatrix = new THREE.Matrix4();
 		var tempVector = new THREE.Vector3();
 		var tempQuaternion = new THREE.Quaternion();
-		var unitX = new THREE.Vector3( 1, 0, 0 );
+		var unitX = new THREE.Vector3( 1, 0, 0 );//基向量
 		var unitY = new THREE.Vector3( 0, 1, 0 );
 		var unitZ = new THREE.Vector3( 0, 0, 1 );
 
@@ -691,7 +692,7 @@
 		domElement.addEventListener( "touchcancel", onPointerUp, false );
 		domElement.addEventListener( "touchleave", onPointerUp, false );
 
-		this.dispose = function () {
+		this.dispose = function () {//取消事件
 
 			domElement.removeEventListener( "mousedown", onPointerDown );
 			domElement.removeEventListener( "touchstart", onPointerDown );
@@ -778,28 +779,28 @@
 			if ( scope.object === undefined ) return;
 
 			scope.object.updateMatrixWorld();
-			worldPosition.setFromMatrixPosition( scope.object.matrixWorld );
-			worldRotation.setFromRotationMatrix( tempMatrix.extractRotation( scope.object.matrixWorld ) );
+			worldPosition.setFromMatrixPosition( scope.object.matrixWorld );//获取物件位置
+			worldRotation.setFromRotationMatrix( tempMatrix.extractRotation( scope.object.matrixWorld ) );//获取物件的旋转
 
 			camera.updateMatrixWorld();
-			camPosition.setFromMatrixPosition( camera.matrixWorld );
-			camRotation.setFromRotationMatrix( tempMatrix.extractRotation( camera.matrixWorld ) );
+			camPosition.setFromMatrixPosition( camera.matrixWorld );//相机位置
+			camRotation.setFromRotationMatrix( tempMatrix.extractRotation( camera.matrixWorld ) );//相机旋转
 
-			scale = worldPosition.distanceTo( camPosition ) / 6 * scope.size;
-			this.position.copy( worldPosition );
-			this.scale.set( scale, scale, scale );
+			scale = worldPosition.distanceTo( camPosition ) / 6 * scope.size;//设置图标的大小，与距离成正比
+			this.position.copy( worldPosition );//放置Gizmo到物体的位置
+			this.scale.set( scale, scale, scale );//缩放Gizmo为屏幕固定大小
 
-			if ( camera instanceof THREE.PerspectiveCamera ) {
+			if ( camera instanceof THREE.PerspectiveCamera ) {//如果是透视相机
 
-				eye.copy( camPosition ).sub( worldPosition ).normalize();
+				eye.copy( camPosition ).sub( worldPosition ).normalize();//Gizmo到相机的方向
 
-			} else if ( camera instanceof THREE.OrthographicCamera ) {
+			} else if ( camera instanceof THREE.OrthographicCamera ) {//如果是平行视图相机
 
-				eye.copy( camPosition ).normalize();
+				eye.copy( camPosition ).normalize();//
 
 			}
 
-			if ( scope.space === "local" ) {
+			if ( scope.space === "local" ) {//切换坐标系
 
 				_gizmo[ _mode ].update( worldRotation, eye );
 
@@ -809,7 +810,7 @@
 
 			}
 
-			_gizmo[ _mode ].highlight( scope.axis );
+			_gizmo[ _mode ].highlight( scope.axis );//高亮显示
 
 		};
 
@@ -891,13 +892,13 @@
 
 		}
 
-		function onPointerMove( event ) {
+		function onPointerMove( event ) {//移动点位，重要函数
 
 			if ( scope.object === undefined || scope.axis === null || _dragging === false || ( event.button !== undefined && event.button !== 0 ) ) return;
 
 			var pointer = event.changedTouches ? event.changedTouches[ 0 ] : event;
 
-			var planeIntersect = intersectObjects( pointer, [ _gizmo[ _mode ].activePlane ] );
+			var planeIntersect = intersectObjects( pointer, [ _gizmo[ _mode ].activePlane ] );//点与面相交
 
 			if ( planeIntersect === false ) return;
 
@@ -913,7 +914,7 @@
 
 				if ( scope.space === "local" ) {
 
-					point.applyMatrix4( tempMatrix.getInverse( worldRotationMatrix ) );
+					point.applyMatrix4( tempMatrix.getInverse( worldRotationMatrix ) );//
 
 					if ( scope.axis.search( "X" ) === - 1 ) point.x = 0;
 					if ( scope.axis.search( "Y" ) === - 1 ) point.y = 0;
