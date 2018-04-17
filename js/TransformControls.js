@@ -223,12 +223,12 @@
 
 	THREE.TransformGizmoTranslate = function () {
 
-		THREE.TransformGizmo.call( this );
+		THREE.TransformGizmo.call( this );//继承
 
-		var arrowGeometry = new THREE.Geometry();
-		var mesh = new THREE.Mesh( new THREE.CylinderGeometry( 0, 0.05, 0.2, 12, 1, false ) );
-		mesh.position.y = 0.5;
-		mesh.updateMatrix();
+		var arrowGeometry = new THREE.Geometry();//新建箭头
+		var mesh = new THREE.Mesh( new THREE.CylinderGeometry( 0, 0.05, 0.2, 12, 1, false ) );//新的圆柱体
+		mesh.position.y = 0.5;//设置圆柱的位置
+		mesh.updateMatrix();//更新变换
 
 		arrowGeometry.merge( mesh.geometry, mesh.matrix );
 
@@ -278,6 +278,7 @@
 
 		this.pickerGizmos = {
 
+
 			X: [
 				[ new THREE.Mesh( new THREE.CylinderBufferGeometry( 0.2, 0, 1, 4, 1, false ), pickerMaterial ), [ 0.6, 0, 0 ], [ 0, 0, - Math.PI / 2 ] ]
 			],
@@ -308,14 +309,16 @@
 
 		};
 
-		this.setActivePlane = function ( axis, eye ) {//根据轴向与视线来确实交互平面
+		this.setActivePlane = function ( axis, eye ) {//根据轴向与视线方向确实交互平面
 
-			var tempMatrix = new THREE.Matrix4();
+			var tempMatrix = new THREE.Matrix4();//临时矩阵
+			//眼睛方向相对于Gizmo的状态
 			eye.applyMatrix4( tempMatrix.getInverse( tempMatrix.extractRotation( this.planes[ "XY" ].matrixWorld ) ) );
 
 			if ( axis === "X" ) {
 
 				this.activePlane = this.planes[ "XY" ];
+				//eye.y比eye.z大意味着视线更接近XZ的法线
 
 				if ( Math.abs( eye.y ) > Math.abs( eye.z ) ) this.activePlane = this.planes[ "XZ" ];
 
@@ -426,6 +429,7 @@
 		};
 
 		this.setActivePlane = function ( axis ) {
+			//交互平面是与旋转轴上垂直的平面
 
 			if ( axis === "E" ) this.activePlane = this.planes[ "XYZE" ];
 
